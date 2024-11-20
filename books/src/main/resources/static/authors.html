@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Author Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input[type="text"],
+        input[type="email"],
+        input[type="date"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .error {
+            color: red;
+            font-size: 0.8em;
+            margin-top: -8px;
+            margin-bottom: 10px;
+        }
+        input.invalid {
+            border: 1px solid red;
+        }
+        .author-item {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        .author-books {
+            margin-top: 10px;
+            padding-left: 20px;
+            font-size: 0.9em;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <h1>Author Management System</h1>
+    
+    <div id="authorForm">
+        <h2>Add/Update Author</h2>
+        <form id="authorFormElement">
+            <input type="hidden" id="authorId">
+            <div class="form-group">
+                <label for="firstName">First Name:</label>
+                <input type="text" id="firstName" required maxlength="50">
+                <div class="error" id="firstNameError"></div>
+            </div>
+            <div class="form-group">
+                <label for="lastName">Last Name:</label>
+                <input type="text" id="lastName" required maxlength="50">
+                <div class="error" id="lastNameError"></div>
+            </div>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" required>
+                <div class="error" id="emailError"></div>
+            </div>
+            <div class="form-group">
+                <label for="birthDate">Birth Date:</label>
+                <input type="date" id="birthDate">
+                <div class="error" id="birthDateError"></div>
+            </div>
+            <button type="submit">Save Author</button>
+        </form>
+    </div>
+
+    <div id="authorList">
+        <h2>Author List</h2>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8080/api/authors';
+
+        function loadAuthors() {
+            fetch(`${API_URL}/with-books`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to load authors');
+                    }
+                    return response.json();
+                })
+                .then(authors => {
+                    const authorList = document.getElementById('authorList');
+                    authorList.innerHTML = '<h2>Author List</h2>';
+                    authors.forEach(author => {
+                        const authorDiv = document.createElement('div');
+                        authorDiv.className = 'author-item';
+                        
+                        let booksHtml = '';
+                        if (author.books && author.books.length > 0) {
+                            booksHtml = `
+                                <div class="author-books">
+                                    <strong>Books:</strong>
+                                    <ul>
+                                        ${author.books.map(book => `<li>${book.title} (${book.publicationYear})</li>`).join('')}
+                                    </ul>
+                                </div>
+                            `;
+                        }
+
+                        authorDiv.innerHTML = `
+                            <h3>${author.firstName} ${author.lastName}</h3>
+                            <p>Email: ${author.email || 'N/A'}</p>
+                            <p>Birth Date: ${author.birthDate || 'N/A'}</p>
+                            ${booksHtml}
+                            <button onclick="editAuthor(${author.id})">Edit</button>
+                            <button onclick="deleteAuthor(${author.id})">Delete</button>
+                        `;
+                        authorList.appendChild(authorDiv);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading authors:', error);
+                    alert('Failed to load authors. Please try again.');
+                });
+        }
+
+        function clearErrors() {
+            document.querySelectorAll('.error').forEach(err => err.textContent = '');
+            document.querySelectorAll('input').forEach(input => input.classList.remove('invalid'));
+        }
+
+        function showError(fieldId, message) {
+            const errorDiv = document.getElementById(fieldId + 'Error');
+            const input = document.getElementById(fieldId);
+            if (errorDiv) {
+                errorDiv.textContent = message;
+            }
+            if (input) {
+                input.classList.add('invalid');
+            }
+        }
+
+        document.getElementById('authorFormElement').addEventListener('submit', function(e) {
+            e.preventDefault();
+            clearErrors();
+
+            const firstName = document.getElementById('firstName').value.trim();
+            const lastName = document.getElementById('lastName').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const birthDate = document.getElementById('birthDate').value;
+            const authorId = document.getElementById('authorId').value;
+
+            // Validation
+            let isValid = true;
+
+            if (!firstName) {
+                showError('firstName', 'First name is required');
+                isValid = false;
+            }
+
+            if (!lastName) {
+                showError('lastName', 'Last name is required');
+                isValid = false;
+            }
+
+            if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                showError('email', 'Please enter a valid email address');
+                isValid = false;
+            }
+
+            if (!isValid) {
+                return;
+            }
+
+            const authorData = {
+                id: authorId ? parseInt(authorId) : null,
+                firstName,
+                lastName,
+                email,
+                birthDate: birthDate || null
+            };
+
+            const method = authorData.id ? 'PUT' : 'POST';
+            const url = authorData.id ? `${API_URL}/${authorData.id}` : API_URL;
+
+            fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(authorData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => {
+                        throw new Error(err.message || 'Failed to save author');
+                    });
+                }
+                return response.json();
+            })
+            .then(() => {
+                loadAuthors();
+                document.getElementById('authorFormElement').reset();
+                document.getElementById('authorId').value = '';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert(error.message || 'Failed to save author. Please check all fields and try again.');
+            });
+        });
+
+        function editAuthor(id) {
+            fetch(`${API_URL}/${id}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to load author details');
+                    }
+                    return response.json();
+                })
+                .then(author => {
+                    document.getElementById('authorId').value = author.id;
+                    document.getElementById('firstName').value = author.firstName || '';
+                    document.getElementById('lastName').value = author.lastName || '';
+                    document.getElementById('email').value = author.email || '';
+                    document.getElementById('birthDate').value = author.birthDate || '';
+                })
+                .catch(error => {
+                    console.error('Error loading author details:', error);
+                    alert('Failed to load author details. Please try again.');
+                });
+        }
+
+        function deleteAuthor(id) {
+            if (confirm('Are you sure you want to delete this author? This will also delete all associated books.')) {
+                fetch(`${API_URL}/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to delete author');
+                    }
+                    loadAuthors();
+                })
+                .catch(error => {
+                    console.error('Error deleting author:', error);
+                    alert('Failed to delete author. Please try again.');
+                });
+            }
+        }
+
+        loadAuthors();
+    </script>
+</body>
+</html>

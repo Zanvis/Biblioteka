@@ -31,6 +31,7 @@ public class BookMapper {
         authorDto.setFirstName(book.getAuthor().getFirstName());
         authorDto.setLastName(book.getAuthor().getLastName());
         authorDto.setEmail(book.getAuthor().getEmail());
+        authorDto.setBirthDate(book.getAuthor().getBirthDate());
         
         dto.setAuthor(authorDto);
         return dto;

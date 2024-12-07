@@ -95,3 +95,40 @@ VALUES
     ('Przygody Informatyka', '9788301234567', 2020, 'Informatyka', 1),
     ('Świat Programowania', '9788309876543', 2019, 'Technologia', 2);
 ```
+
+## 🧪 Testowanie API za pomocą Postmana
+### 📥 Import Kolekcji Testów
+W repozytorium znajduje się plik `library-api-collection.json`, który można bezpośrednio zaimportować do Postmana:
+
+1. Otwórz Postmana
+2. Kliknij `Import` w lewym górnym rogu
+3. Przeciągnij plik `library-api-collection.json`, wklej jego zawartość lub wybierz go ręcznie
+
+### 📋 Dostępne Zestawy Testów
+#### Testy Autorów
+- `Get All Authors`: Pobiera listę wszystkich autorów
+- `Get Author by ID`: Pobiera szczegóły konkretnego autora
+- `Create Author`: Tworzy nowego autora
+- `Update Author`: Aktualizuje dane autora
+- `Delete Author`: Usuwa autora
+
+#### Testy Książek
+- `Get All Books`: Pobiera listę wszystkich książek
+- `Get Book by ID`: Pobiera szczegóły konkretnej książki
+- `Create Book`: Tworzy nową książkę
+- `Update Book`: Aktualizuje dane książki
+- `Delete Book`: Usuwa książkę
+- `Get Books with Authors`: Pobiera książki wraz z informacjami o autorach
+- `Get Book by ID with Author`: Pobiera szczegóły książki wraz z informacjami o autorze
+
+### ✅ Automatyczne Testy
+Każdy endpoint posiada wbudowane testy sprawdzające:
+- Poprawność kodu odpowiedzi HTTP
+- Strukturę zwracanych danych
+- Zgodność danych z oczekiwaniami
+
+### 🚀 Uruchomienie Testów
+1. Upewnij się, że aplikacja jest uruchomiona lokalnie
+2. W Postmanie wybierz kolekcję `Library API Tests`
+3. Kliknij `Run Collection` aby uruchomić wszystkie testy
+4. Przejrzyj wyniki testów w panelu uruchomieniowym

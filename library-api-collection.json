@@ -82,7 +82,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"email\": \"john@example.com\",\n    \"birthDate\": \"1980-01-01\"\n}"
+							"raw": "{\n    \"firstName\": \"Andrzej\",\n    \"lastName\": \"Lewandowski\",\n    \"email\": \"andrzej@mail.com\",\n    \"birthDate\": \"1980-01-01\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/authors",
@@ -101,8 +101,8 @@
 									"",
 									"pm.test(\"Author created with correct data\", function () {",
 									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.firstName).to.eql(\"John\");",
-									"    pm.expect(jsonData.lastName).to.eql(\"Doe\");",
+									"    pm.expect(jsonData.firstName).to.eql(\"Andrzej\");",
+									"    pm.expect(jsonData.lastName).to.eql(\"Lewandowski\");",
 									"});"
 								],
 								"type": "text/javascript"
@@ -122,12 +122,12 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"id\": 1,\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"email\": \"john.updated@example.com\",\n    \"birthDate\": \"1980-01-01\"\n}"
+							"raw": "{\n    \"id\": 3,\n    \"firstName\": \"Andrzej\",\n    \"lastName\": \"Lewandowski\",\n    \"email\": \"andrzej.updated@example.com\",\n    \"birthDate\": \"1980-01-01\"\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/api/authors/1",
+							"raw": "{{base_url}}/api/authors/3",
 							"host": ["{{base_url}}"],
-							"path": ["api", "authors", "1"]
+							"path": ["api", "authors", "3"]
 						}
 					},
 					"event": [
@@ -141,7 +141,7 @@
 									"",
 									"pm.test(\"Author updated successfully\", function () {",
 									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.id).to.eql(1);",
+									"    pm.expect(jsonData.id).to.eql(3);",
 									"});"
 								],
 								"type": "text/javascript"
